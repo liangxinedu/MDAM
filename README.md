@@ -1,5 +1,5 @@
 # Multi-Decoder Attention Model with Embedding Glimpse for Solving Vehicle Routing Problems
-Liang Xin, Wen Song, Zhiguang Cao, Jie Zhang.  Multi-Decoder Attention Model with Embedding Glimpse for Solving Vehicle Routing Problems, 35th AAAI Conference on Artificial Intelligence (AAAI), 2021 [[pdf]](https://arxiv.org/pdf/2012.10638.pdf)
+Liang Xin, Wen Song, Zhiguang Cao, Jie Zhang.  Multi-Decoder Attention Model with Embedding Glimpse for Solving Vehicle Routing Problems, Proceedings of the AAAI Conference on Artificial Intelligence, pp.12042-12049, 2021. [[pdf]](https://ojs.aaai.org/index.php/AAAI/article/view/17430)
 
 To train the model (e.g. TSP with 20 nodes)
 ```bash
