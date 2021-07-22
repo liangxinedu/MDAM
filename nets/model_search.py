@@ -321,8 +321,8 @@ class AttentionModel(nn.Module):
                 ll_beam, top_index = torch.topk(ll_beam_new, min(beam_size, ll_beam_new.size(1)))
                 node_to_add = node_index_beam.gather(1, top_index)
 
-                mask_beam = mask_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
-                seq_beam = seq_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                mask_beam = mask_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
+                seq_beam = seq_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                 seq_beam = torch.cat([seq_beam, node_to_add.view(batch_size, -1, 1)], dim=-1)
 
                 distance_beam = distance_beam[torch.arange(batch_size).view(-1, 1), top_index]
@@ -346,12 +346,12 @@ class AttentionModel(nn.Module):
                     )
 
                 else:
-                    fixed_index = top_index / expand_size * batch_size + torch.arange(batch_size, device=top_index.device).view(-1, 1)
+                    fixed_index = top_index // expand_size * batch_size + torch.arange(batch_size, device=top_index.device).view(-1, 1)
                     fixed_index = fixed_index.transpose(dim0=1,dim1=0).contiguous().view(-1)
                     fixed_beam = fixed_beam[fixed_index]
 
                 if self.is_op:
-                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                     visited_beam = visited_beam.scatter(-1, seq_beam[:, :, -1, None], 1)
                     coord_all = loc_with_depot.view(batch_size, 1, -1, 2)
                     coord_cur = loc_with_depot[torch.arange(batch_size).view(-1, 1), seq_beam[:, :, -1]].view(batch_size, seq_beam.size(1), 1, -1)
@@ -360,18 +360,18 @@ class AttentionModel(nn.Module):
                     mask_beam = visited_ | visited_[:, :, 0:1] | exceeds_length
                     mask_beam[:, :, 0] = 0
                 elif self.is_pctsp:
-                    prize_beam = prize_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                    prize_beam = prize_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                     prize_to_collect = real_prize_with_depot[torch.arange(batch_size).view(-1, 1), seq_beam[:, :, -1]]
                     prize_beam = prize_beam + prize_to_collect
-                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                     visited_beam = visited_beam.scatter(-1, seq_beam[:, :, -1, None], 1)
                     mask_beam = visited_beam | visited_beam[:, :, 0:1]
                     mask_beam[:, :, 0] = (prize_beam < 1.) & (visited_beam[:, :, 1:].int().sum(-1) < visited_beam[:, :, 1:].size(-1))
                     mask_beam = mask_beam > 0
                 elif self.is_vrp and self.allow_partial:
                     used_beam = used_beam[torch.arange(batch_size).view(-1, 1), top_index]
-                    used_beam_last = used_beam_last[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
-                    demand_with_depot = demand_with_depot[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                    used_beam_last = used_beam_last[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
+                    demand_with_depot = demand_with_depot[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                     selected_demand = selected_demand.gather(1, top_index)
                     delivered_demand = torch.min(selected_demand, self.problem.VEHICLE_CAPACITY - used_beam_last)
                     demand_with_depot = demand_with_depot.scatter(
@@ -386,7 +386,7 @@ class AttentionModel(nn.Module):
                     mask_beam = torch.cat((mask_depot[:, :, None], mask_loc), -1)
                 elif self.is_vrp and not self.allow_partial:
                     used_beam = used_beam[torch.arange(batch_size).view(-1, 1), top_index]
-                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index / expand_size]
+                    visited_beam = visited_beam[torch.arange(batch_size).view(-1, 1), top_index // expand_size]
                     visited_beam = visited_beam.scatter(-1, seq_beam[:, :, -1, None], 1)
                     mask_beam = ((visited_beam[:, :, 1:] > 0)
                            | (demand.view(batch_size, 1, graph_size - 1) + used_beam.view(batch_size, -1, 1)
