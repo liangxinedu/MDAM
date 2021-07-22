@@ -29,6 +29,12 @@ bash eval.sh pctsp
 bash eval.sh spctsp
 ```
 
+Dependencies
+* Python==3.6
+* NumPy
+* PyTorch>=1.4.0
+* tqdm
+* tensorboard_logger
 
 MDAM is developed based on https://github.com/wouterkool/attention-learn-to-route (Kool, W.; van Hoof, H.; and Welling, M. 2019. Attention,
 Learn to Solve Routing Problems! In Proceedings of International Conference on Learning Representations (ICLR).)
